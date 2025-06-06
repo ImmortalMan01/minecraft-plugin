@@ -7,12 +7,16 @@ version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
-    maven { url 'https://papermc.io/repo/repository/maven-public/' }
+    // Use the new PaperMC repository
+    maven { url 'https://repo.papermc.io/repository/maven-public/' }
+    // Repository for WorldEdit
+    maven { url 'https://maven.enginehub.org/repo/' }
 }
 
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.17'
+    compileOnly 'com.sk89q.worldedit:worldedit-core:7.2.17'
 }
 
 java {

@@ -1,7 +1,11 @@
 package com.example.areaplayercontrol;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.bukkit.selections.Selection;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.IncompleteRegionException;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -121,9 +125,18 @@ public class AreaPlayerControl extends JavaPlugin {
             player.sendMessage("WorldEdit not found");
             return null;
         }
-        Selection sel = we.getSelection(player);
-        if (sel == null) return null;
-        return new Region(sel.getMinimumPoint(), sel.getMaximumPoint());
+        LocalSession session = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(player));
+        com.sk89q.worldedit.regions.Region sel;
+        try {
+            sel = session.getSelection(BukkitAdapter.adapt(player.getWorld()));
+        } catch (IncompleteRegionException e) {
+            return null;
+        }
+        BlockVector3 min = sel.getMinimumPoint();
+        BlockVector3 max = sel.getMaximumPoint();
+        Location pos1 = new Location(player.getWorld(), min.getX(), min.getY(), min.getZ());
+        Location pos2 = new Location(player.getWorld(), max.getX(), max.getY(), max.getZ());
+        return new Region(pos1, pos2);
     }
 
     private String formatLocation(Location loc) {
