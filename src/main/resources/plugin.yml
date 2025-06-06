@@ -1,0 +1,9 @@
+name: AreaPlayerControl
+main: com.example.areaplayercontrol.AreaPlayerControl
+version: 1.0
+api-version: '1.21'
+commands:
+  area:
+    description: Manage areas
+    usage: /<command> <save|remove|info|list> [name]
+    aliases: [areaplayercontrol]
