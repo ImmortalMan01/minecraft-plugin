@@ -9,6 +9,7 @@ AreaPlayerControl, PaperMC tabanlı Minecraft sunucuları için basit bir alan y
 /area remove <isim> - Belirtilen bölgeyi siler.
 /area info <isim>   - Bölge koordinatlarını ve içindeki oyuncu sayısını gösterir.
 /area list          - Kayıtlı tüm bölgeleri listeler.
+/area list <isim>   - Bölge için kullanabileceğiniz placeholder bilgisini gösterir.
 /area reload        - Yapılandırmayı yeniden yükler.
 ```
 
@@ -37,3 +38,4 @@ Eklenti, PlaceholderAPI yüklü ise her kayıtlı bölge için
 sağlar. Bu placeholder ilgili bölge içindeki çevrimiçi oyuncu
 sayısını döndürür ve TitleManager gibi eklentiler tarafından
 skorbordlarda kullanılabilir.
+Placeholder bilgisini hızlıca öğrenmek için `/area list <isim>` komutunu kullanabilirsiniz.

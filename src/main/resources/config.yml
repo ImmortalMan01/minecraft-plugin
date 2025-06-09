@@ -10,7 +10,7 @@ descriptions:
   save: "Geçerli WorldEdit seçimini verilen isimle kaydeder."
   remove: "Belirtilen bölgeyi siler."
   info: "Bölge koordinatlarını ve içindeki oyuncu sayısını gösterir."
-  list: "Kayıtlı tüm bölgeleri listeler."
+  list: "Kayıtlı tüm bölgeleri listeler. İsim belirtilirse placeholder bilgisini gösterir."
   menu: "Tüm komutların açıklamalarını gösterir."
   reload: "Eklentinin yapılandırmasını yeniden yükler."
 
@@ -27,6 +27,7 @@ messages:
   playersInside: "&7İçerideki oyuncu sayısı: &f%count%"
   regionsHeader: "&6Kayıtlı Bölgeler:"
   regionEntry: "&e- %name%"
+  placeholderInfo: "&a%name% &7için kullanabileceğin placeholder: &e%placeholder%"
   menuHeader: "&6[ Bölge Komutları ]"
   menuEntry: "&e/%cmd% %sub%%usage% &7- %desc%"
   reloaded: "&aYapılandırma yeniden yüklendi."
