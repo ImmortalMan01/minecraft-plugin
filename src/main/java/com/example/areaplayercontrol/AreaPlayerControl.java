@@ -171,9 +171,22 @@ public class AreaPlayerControl extends JavaPlugin {
             }
             return true;
         } else if (sub.equals(cmdList)) {
-            sender.sendMessage(msg("regionsHeader"));
-            for (String key : regions.keySet()) {
-                sender.sendMessage(msg("regionEntry", Map.of("name", key)));
+            if (args.length >= 2) {
+                String name = args[1];
+                if (regions.containsKey(name)) {
+                    String placeholder = "%areaplayercontrol_players_" + name + "%";
+                    sender.sendMessage(msg("placeholderInfo", Map.of(
+                            "name", name,
+                            "placeholder", placeholder
+                    )));
+                } else {
+                    sender.sendMessage(msg("regionNotFound"));
+                }
+            } else {
+                sender.sendMessage(msg("regionsHeader"));
+                for (String key : regions.keySet()) {
+                    sender.sendMessage(msg("regionEntry", Map.of("name", key)));
+                }
             }
             return true;
         } else if (sub.equals(cmdMenu)) {
