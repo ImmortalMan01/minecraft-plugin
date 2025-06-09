@@ -232,19 +232,18 @@ public class AreaPlayerControl extends JavaPlugin {
     }
 
     private void registerBaseCommand() {
-        try {
-            Constructor<PluginCommand> cons = PluginCommand.class.getDeclaredConstructor(String.class, JavaPlugin.class);
-            cons.setAccessible(true);
-            PluginCommand alias = cons.newInstance(baseCommand, this);
-            alias.setExecutor(this);
-            alias.setTabCompleter(this);
-            alias.setAliases(Collections.emptyList());
-            alias.setDescription("Manage areas");
-            alias.setUsage("/" + baseCommand + " <" + String.join("|", cmdSave, cmdRemove, cmdInfo, cmdList, cmdMenu, cmdReload) + "> [name]");
-            getCommandMap().register(getDescription().getName(), alias);
-        } catch (Exception e) {
-            getLogger().warning("Failed to register base command alias: " + e.getMessage());
+        PluginCommand cmd = getCommand("areaplayercontrol");
+        if (cmd == null) {
+            getLogger().warning("Base command registration failed");
+            return;
         }
+
+        cmd.setExecutor(this);
+        cmd.setTabCompleter(this);
+        cmd.setAliases(Collections.singletonList(baseCommand));
+        cmd.setDescription("Manage areas");
+        cmd.setUsage("/" + baseCommand + " <" + String.join("|",
+                cmdSave, cmdRemove, cmdInfo, cmdList, cmdMenu, cmdReload) + "> [name]");
     }
 
     private CommandMap getCommandMap() throws Exception {
@@ -268,8 +267,8 @@ public class AreaPlayerControl extends JavaPlugin {
     }
 
     private void reloadPlugin() {
-        saveRegions();
         reloadConfig();
+        saveRegions();
         regions.clear();
         messages.clear();
         descriptions.clear();
