@@ -11,6 +11,12 @@ AreaPlayerControl, PaperMC tabanlı Minecraft sunucuları için basit bir alan y
 /area list          - Kayıtlı tüm bölgeleri listeler.
 ```
 
+## Yapılandırma
+
+`config.yml` dosyasıyla ana komut adını ve alt komutları değiştirebilir,
+mesajların Türkçe çevirilerini de özelleştirebilirsiniz. `commands.base`
+anahtarını düzenleyerek `/area` komutunun adını değiştirebilirsiniz.
+
 ## Derleme (Jar Oluşturma)
 
 Projenin derlenebilmesi için Java 21 ve Gradle'ın yüklü olması gerekir. Şu adımları izleyerek eklenti jar dosyasını oluşturabilirsiniz:
