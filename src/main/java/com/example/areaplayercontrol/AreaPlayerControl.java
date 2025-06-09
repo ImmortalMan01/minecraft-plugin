@@ -26,7 +26,7 @@ import java.util.Set;
 
 public class AreaPlayerControl extends JavaPlugin {
     private Map<String, Region> regions = new HashMap<>();
-    private String baseCommand;
+    private final String baseCommand = "area";
     private String cmdSave;
     private String cmdRemove;
     private String cmdInfo;
@@ -41,7 +41,6 @@ public class AreaPlayerControl extends JavaPlugin {
         saveDefaultConfig();
         FileConfiguration config = getConfig();
 
-        baseCommand = config.getString("commands.base", "area").toLowerCase();
         cmdSave = config.getString("commands.save", "save").toLowerCase();
         cmdRemove = config.getString("commands.remove", "remove").toLowerCase();
         cmdInfo = config.getString("commands.info", "info").toLowerCase();
@@ -275,7 +274,6 @@ public class AreaPlayerControl extends JavaPlugin {
 
         FileConfiguration config = getConfig();
 
-        baseCommand = config.getString("commands.base", "area").toLowerCase();
         cmdSave = config.getString("commands.save", "save").toLowerCase();
         cmdRemove = config.getString("commands.remove", "remove").toLowerCase();
         cmdInfo = config.getString("commands.info", "info").toLowerCase();
