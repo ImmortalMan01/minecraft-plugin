@@ -99,7 +99,13 @@ public class AreaPlayerControl extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(ChatColor.YELLOW + "/" + baseCommand + " <" + String.join("|", cmdSave, cmdRemove, cmdInfo, cmdList, cmdMenu) + "> [name]");
+            // Show the command menu when no sub command is provided
+            sender.sendMessage(msg("menuHeader"));
+            sendMenuEntry(sender, cmdSave, " <name>", descriptions.get(cmdSave));
+            sendMenuEntry(sender, cmdRemove, " <name>", descriptions.get(cmdRemove));
+            sendMenuEntry(sender, cmdInfo, " <name>", descriptions.get(cmdInfo));
+            sendMenuEntry(sender, cmdList, "", descriptions.get(cmdList));
+            sendMenuEntry(sender, cmdMenu, "", descriptions.get(cmdMenu));
             return true;
         }
         String sub = args[0].toLowerCase();
@@ -166,6 +172,22 @@ public class AreaPlayerControl extends JavaPlugin {
         return false;
     }
 
+    @Override
+    public java.util.List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (args.length == 1) {
+            java.util.List<String> subs = java.util.Arrays.asList(cmdSave, cmdRemove, cmdInfo, cmdList, cmdMenu);
+            String prefix = args[0].toLowerCase();
+            java.util.List<String> result = new java.util.ArrayList<>();
+            for (String s : subs) {
+                if (s.startsWith(prefix)) {
+                    result.add(s);
+                }
+            }
+            return result;
+        }
+        return java.util.Collections.emptyList();
+    }
+
     private Region getSelection(Player player) {
         WorldEditPlugin we = (WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit");
         if (we == null) {
@@ -207,6 +229,7 @@ public class AreaPlayerControl extends JavaPlugin {
             cons.setAccessible(true);
             PluginCommand alias = cons.newInstance(baseCommand, this);
             alias.setExecutor(this);
+            alias.setTabCompleter(this);
             alias.setAliases(Collections.emptyList());
             alias.setDescription("Manage areas");
             alias.setUsage("/" + baseCommand + " <" + String.join("|", cmdSave, cmdRemove, cmdInfo, cmdList, cmdMenu) + "> [name]");
