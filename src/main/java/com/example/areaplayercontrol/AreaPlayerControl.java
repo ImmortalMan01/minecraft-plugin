@@ -232,7 +232,6 @@ public class AreaPlayerControl extends JavaPlugin {
     }
 
     private void registerBaseCommand() {
-        if (baseCommand.equalsIgnoreCase("area")) return;
         try {
             Constructor<PluginCommand> cons = PluginCommand.class.getDeclaredConstructor(String.class, JavaPlugin.class);
             cons.setAccessible(true);
