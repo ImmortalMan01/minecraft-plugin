@@ -23,6 +23,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import com.example.areaplayercontrol.RegionPlaceholderExpansion;
 
 public class AreaPlayerControl extends JavaPlugin {
     private Map<String, Region> regions = new HashMap<>();
@@ -35,6 +37,7 @@ public class AreaPlayerControl extends JavaPlugin {
     private String cmdReload;
     private Map<String, String> descriptions = new HashMap<>();
     private Map<String, String> messages = new HashMap<>();
+    private PlaceholderExpansion expansion;
 
     @Override
     public void onEnable() {
@@ -66,11 +69,21 @@ public class AreaPlayerControl extends JavaPlugin {
 
         registerBaseCommand();
         loadRegions();
+
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            expansion = new RegionPlaceholderExpansion(this);
+            expansion.register();
+        } else {
+            getLogger().info("PlaceholderAPI not found, placeholders disabled");
+        }
     }
 
     @Override
     public void onDisable() {
         saveRegions();
+        if (expansion != null) {
+            expansion.unregister();
+        }
     }
 
     private void loadRegions() {
@@ -228,6 +241,10 @@ public class AreaPlayerControl extends JavaPlugin {
             }
         }
         return count;
+    }
+
+    public int getRegionCount() {
+        return regions.size();
     }
 
     private void registerBaseCommand() {

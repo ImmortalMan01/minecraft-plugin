@@ -31,3 +31,7 @@ Projenin derlenebilmesi için Java 21 ve Gradle'ın yüklü olması gerekir. Şu
 2. Derleme tamamlandığında `build/libs/AreaPlayerControl-1.0-SNAPSHOT.jar` dosyası oluşur. Bu jar dosyasını PaperMC sunucunuzun `plugins/` klasörüne kopyalayarak eklentiyi kullanmaya başlayabilirsiniz.
 
 WorldEdit eklentisinin sunucuda yüklü olması gerektigini unutmayın.
+
+Eklenti, PlaceholderAPI yüklü ise `areaplayercontrol_regions` adında bir
+placeholder sunar. Bu placeholder kayıtlı bölge sayısını döndürür ve
+TitleManager gibi eklentiler tarafından skorbordda kullanılabilir.
