@@ -5,5 +5,5 @@ api-version: '1.21'
 commands:
   area:
     description: Manage areas
-    usage: /<command> <save|remove|info|list|menu> [name]
+    usage: /<command> <save|remove|info|list|menu|reload> [name]
     aliases: [areaplayercontrol]

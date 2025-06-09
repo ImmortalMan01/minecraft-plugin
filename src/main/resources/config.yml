@@ -5,6 +5,7 @@ commands:
   info: info
   list: list
   menu: menu
+  reload: reload
 
 descriptions:
   save: "Geçerli WorldEdit seçimini verilen isimle kaydeder."
@@ -12,6 +13,7 @@ descriptions:
   info: "Bölge koordinatlarını ve içindeki oyuncu sayısını gösterir."
   list: "Kayıtlı tüm bölgeleri listeler."
   menu: "Tüm komutların açıklamalarını gösterir."
+  reload: "Eklentinin yapılandırmasını yeniden yükler."
 
 messages:
   onlyPlayers: "&cBu komutu sadece oyuncular kullanabilir."
@@ -28,3 +30,4 @@ messages:
   regionEntry: "&e- %name%"
   menuHeader: "&6[ Bölge Komutları ]"
   menuEntry: "&e/%cmd% %sub%%usage% &7- %desc%"
+  reloaded: "&aYapılandırma yeniden yüklendi."
