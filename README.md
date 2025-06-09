@@ -32,6 +32,8 @@ Projenin derlenebilmesi için Java 21 ve Gradle'ın yüklü olması gerekir. Şu
 
 WorldEdit eklentisinin sunucuda yüklü olması gerektigini unutmayın.
 
-Eklenti, PlaceholderAPI yüklü ise `areaplayercontrol_regions` adında bir
-placeholder sunar. Bu placeholder kayıtlı bölge sayısını döndürür ve
-TitleManager gibi eklentiler tarafından skorbordda kullanılabilir.
+Eklenti, PlaceholderAPI yüklü ise her kayıtlı bölge için
+`%areaplayercontrol_players_<isim>%` biçiminde bir placeholder
+sağlar. Bu placeholder ilgili bölge içindeki çevrimiçi oyuncu
+sayısını döndürür ve TitleManager gibi eklentiler tarafından
+skorbordlarda kullanılabilir.

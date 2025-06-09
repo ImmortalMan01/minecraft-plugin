@@ -243,8 +243,13 @@ public class AreaPlayerControl extends JavaPlugin {
         return count;
     }
 
-    public int getRegionCount() {
-        return regions.size();
+
+    public int getPlayersInRegion(String name) {
+        Region r = regions.get(name);
+        if (r == null) {
+            return 0;
+        }
+        return countPlayers(r);
     }
 
     private void registerBaseCommand() {

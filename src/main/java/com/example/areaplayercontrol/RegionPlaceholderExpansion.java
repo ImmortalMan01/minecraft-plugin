@@ -4,7 +4,12 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 
 /**
- * PlaceholderAPI expansion providing the number of saved regions.
+ * PlaceholderAPI expansion that exposes the player count for each saved region.
+ *
+ * <p>Use placeholders of the form
+ * <code>%areaplayercontrol_players_{region}%</code> where {@code region}
+ * is the name of a saved region. The placeholder returns the number of players
+ * currently inside that region.</p>
  */
 public class RegionPlaceholderExpansion extends PlaceholderExpansion {
 
@@ -41,8 +46,9 @@ public class RegionPlaceholderExpansion extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(Player player, String identifier) {
-        if (identifier.equalsIgnoreCase("regions") || identifier.equalsIgnoreCase("region_count")) {
-            return String.valueOf(plugin.getRegionCount());
+        if (identifier.toLowerCase().startsWith("players_")) {
+            String name = identifier.substring("players_".length());
+            return String.valueOf(plugin.getPlayersInRegion(name));
         }
         return null;
     }
