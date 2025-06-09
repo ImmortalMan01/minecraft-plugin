@@ -32,6 +32,7 @@ public class AreaPlayerControl extends JavaPlugin {
     private String cmdInfo;
     private String cmdList;
     private String cmdMenu;
+    private String cmdReload;
     private Map<String, String> descriptions = new HashMap<>();
     private Map<String, String> messages = new HashMap<>();
 
@@ -46,12 +47,14 @@ public class AreaPlayerControl extends JavaPlugin {
         cmdInfo = config.getString("commands.info", "info").toLowerCase();
         cmdList = config.getString("commands.list", "list").toLowerCase();
         cmdMenu = config.getString("commands.menu", "menu").toLowerCase();
+        cmdReload = config.getString("commands.reload", "reload").toLowerCase();
 
         descriptions.put(cmdSave, config.getString("descriptions.save", "Save a region"));
         descriptions.put(cmdRemove, config.getString("descriptions.remove", "Remove a region"));
         descriptions.put(cmdInfo, config.getString("descriptions.info", "Show region info"));
         descriptions.put(cmdList, config.getString("descriptions.list", "List regions"));
         descriptions.put(cmdMenu, config.getString("descriptions.menu", "Show command menu"));
+        descriptions.put(cmdReload, config.getString("descriptions.reload", "Reload config"));
 
         if (config.isConfigurationSection("messages")) {
             for (String key : config.getConfigurationSection("messages").getKeys(false)) {
@@ -106,6 +109,7 @@ public class AreaPlayerControl extends JavaPlugin {
             sendMenuEntry(sender, cmdInfo, " <name>", descriptions.get(cmdInfo));
             sendMenuEntry(sender, cmdList, "", descriptions.get(cmdList));
             sendMenuEntry(sender, cmdMenu, "", descriptions.get(cmdMenu));
+            sendMenuEntry(sender, cmdReload, "", descriptions.get(cmdReload));
             return true;
         }
         String sub = args[0].toLowerCase();
@@ -167,6 +171,11 @@ public class AreaPlayerControl extends JavaPlugin {
             sendMenuEntry(sender, cmdInfo, " <name>", descriptions.get(cmdInfo));
             sendMenuEntry(sender, cmdList, "", descriptions.get(cmdList));
             sendMenuEntry(sender, cmdMenu, "", descriptions.get(cmdMenu));
+            sendMenuEntry(sender, cmdReload, "", descriptions.get(cmdReload));
+            return true;
+        } else if (sub.equals(cmdReload)) {
+            reloadPlugin();
+            sender.sendMessage(msg("reloaded"));
             return true;
         }
         return false;
@@ -175,7 +184,7 @@ public class AreaPlayerControl extends JavaPlugin {
     @Override
     public java.util.List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            java.util.List<String> subs = java.util.Arrays.asList(cmdSave, cmdRemove, cmdInfo, cmdList, cmdMenu);
+            java.util.List<String> subs = java.util.Arrays.asList(cmdSave, cmdRemove, cmdInfo, cmdList, cmdMenu, cmdReload);
             String prefix = args[0].toLowerCase();
             java.util.List<String> result = new java.util.ArrayList<>();
             for (String s : subs) {
@@ -232,7 +241,7 @@ public class AreaPlayerControl extends JavaPlugin {
             alias.setTabCompleter(this);
             alias.setAliases(Collections.emptyList());
             alias.setDescription("Manage areas");
-            alias.setUsage("/" + baseCommand + " <" + String.join("|", cmdSave, cmdRemove, cmdInfo, cmdList, cmdMenu) + "> [name]");
+            alias.setUsage("/" + baseCommand + " <" + String.join("|", cmdSave, cmdRemove, cmdInfo, cmdList, cmdMenu, cmdReload) + "> [name]");
             getCommandMap().register(getDescription().getName(), alias);
         } catch (Exception e) {
             getLogger().warning("Failed to register base command alias: " + e.getMessage());
@@ -257,6 +266,43 @@ public class AreaPlayerControl extends JavaPlugin {
             }
         }
         return m;
+    }
+
+    private void reloadPlugin() {
+        saveRegions();
+        reloadConfig();
+        regions.clear();
+        messages.clear();
+        descriptions.clear();
+
+        FileConfiguration config = getConfig();
+
+        baseCommand = config.getString("commands.base", "area").toLowerCase();
+        cmdSave = config.getString("commands.save", "save").toLowerCase();
+        cmdRemove = config.getString("commands.remove", "remove").toLowerCase();
+        cmdInfo = config.getString("commands.info", "info").toLowerCase();
+        cmdList = config.getString("commands.list", "list").toLowerCase();
+        cmdMenu = config.getString("commands.menu", "menu").toLowerCase();
+        cmdReload = config.getString("commands.reload", "reload").toLowerCase();
+
+        descriptions.put(cmdSave, config.getString("descriptions.save", "Save a region"));
+        descriptions.put(cmdRemove, config.getString("descriptions.remove", "Remove a region"));
+        descriptions.put(cmdInfo, config.getString("descriptions.info", "Show region info"));
+        descriptions.put(cmdList, config.getString("descriptions.list", "List regions"));
+        descriptions.put(cmdMenu, config.getString("descriptions.menu", "Show command menu"));
+        descriptions.put(cmdReload, config.getString("descriptions.reload", "Reload config"));
+
+        if (config.isConfigurationSection("messages")) {
+            for (String key : config.getConfigurationSection("messages").getKeys(false)) {
+                String msg = config.getString("messages." + key);
+                if (msg != null) {
+                    messages.put(key, ChatColor.translateAlternateColorCodes('&', msg));
+                }
+            }
+        }
+
+        registerBaseCommand();
+        loadRegions();
     }
 
     private void sendMenuEntry(CommandSender sender, String sub, String usage, String desc) {

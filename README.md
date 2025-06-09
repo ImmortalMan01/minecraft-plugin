@@ -9,6 +9,7 @@ AreaPlayerControl, PaperMC tabanlı Minecraft sunucuları için basit bir alan y
 /area remove <isim> - Belirtilen bölgeyi siler.
 /area info <isim>   - Bölge koordinatlarını ve içindeki oyuncu sayısını gösterir.
 /area list          - Kayıtlı tüm bölgeleri listeler.
+/area reload        - Yapılandırmayı yeniden yükler.
 ```
 
 ## Yapılandırma
