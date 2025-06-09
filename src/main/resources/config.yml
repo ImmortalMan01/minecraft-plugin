@@ -1,0 +1,13 @@
+commands:
+  save: save
+  remove: remove
+  info: info
+  list: list
+  menu: menu
+
+descriptions:
+  save: "Ge\xE7erli WorldEdit se\xE7imini verilen isimle kaydeder."
+  remove: "Belirtilen b\xF6lgeyi siler."
+  info: "B\xF6lge koordinatlar\x131n\x131 ve i\xE7indeki oyuncu say\x131s\x131n\x131 g\xF6sterir."
+  list: "Kay\x131tl\x131 t\xFCm b\xF6lgeleri listeler."
+  menu: "T\xFCm komutlar\x131n a\xE7\x131klamalar\x131n\x131 g\xF6sterir."

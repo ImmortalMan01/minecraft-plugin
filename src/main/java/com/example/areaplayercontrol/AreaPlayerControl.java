@@ -20,10 +20,29 @@ import java.util.Set;
 
 public class AreaPlayerControl extends JavaPlugin {
     private Map<String, Region> regions = new HashMap<>();
+    private String cmdSave;
+    private String cmdRemove;
+    private String cmdInfo;
+    private String cmdList;
+    private String cmdMenu;
+    private Map<String, String> descriptions = new HashMap<>();
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        FileConfiguration config = getConfig();
+        cmdSave = config.getString("commands.save", "save").toLowerCase();
+        cmdRemove = config.getString("commands.remove", "remove").toLowerCase();
+        cmdInfo = config.getString("commands.info", "info").toLowerCase();
+        cmdList = config.getString("commands.list", "list").toLowerCase();
+        cmdMenu = config.getString("commands.menu", "menu").toLowerCase();
+
+        descriptions.put(cmdSave, config.getString("descriptions.save", "Save a region"));
+        descriptions.put(cmdRemove, config.getString("descriptions.remove", "Remove a region"));
+        descriptions.put(cmdInfo, config.getString("descriptions.info", "Show region info"));
+        descriptions.put(cmdList, config.getString("descriptions.list", "List regions"));
+        descriptions.put(cmdMenu, config.getString("descriptions.menu", "Show command menu"));
+
         loadRegions();
     }
 
@@ -60,17 +79,17 @@ public class AreaPlayerControl extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage("/area <save|remove|info|list> [name]");
+            sender.sendMessage("/area <" + String.join("|", cmdSave, cmdRemove, cmdInfo, cmdList, cmdMenu) + "> [name]");
             return true;
         }
         String sub = args[0].toLowerCase();
-        if (sub.equals("save")) {
+        if (sub.equals(cmdSave)) {
             if (!(sender instanceof Player)) {
                 sender.sendMessage("Only players can use this command");
                 return true;
             }
             if (args.length < 2) {
-                sender.sendMessage("Usage: /area save <name>");
+                sender.sendMessage("Usage: /area " + cmdSave + " <name>");
                 return true;
             }
             Player player = (Player) sender;
@@ -82,9 +101,9 @@ public class AreaPlayerControl extends JavaPlugin {
             regions.put(args[1], region);
             sender.sendMessage("Region " + args[1] + " saved.");
             return true;
-        } else if (sub.equals("remove")) {
+        } else if (sub.equals(cmdRemove)) {
             if (args.length < 2) {
-                sender.sendMessage("Usage: /area remove <name>");
+                sender.sendMessage("Usage: /area " + cmdRemove + " <name>");
                 return true;
             }
             if (regions.remove(args[1]) != null) {
@@ -93,9 +112,9 @@ public class AreaPlayerControl extends JavaPlugin {
                 sender.sendMessage("Region not found");
             }
             return true;
-        } else if (sub.equals("info")) {
+        } else if (sub.equals(cmdInfo)) {
             if (args.length < 2) {
-                sender.sendMessage("Usage: /area info <name>");
+                sender.sendMessage("Usage: /area " + cmdInfo + " <name>");
                 return true;
             }
             Region region = regions.get(args[1]);
@@ -109,11 +128,19 @@ public class AreaPlayerControl extends JavaPlugin {
                 sender.sendMessage("Region not found");
             }
             return true;
-        } else if (sub.equals("list")) {
+        } else if (sub.equals(cmdList)) {
             sender.sendMessage("Regions:");
             for (String key : regions.keySet()) {
                 sender.sendMessage("- " + key);
             }
+            return true;
+        } else if (sub.equals(cmdMenu)) {
+            sender.sendMessage("Area commands:");
+            sender.sendMessage("/area " + cmdSave + " <name> - " + descriptions.get(cmdSave));
+            sender.sendMessage("/area " + cmdRemove + " <name> - " + descriptions.get(cmdRemove));
+            sender.sendMessage("/area " + cmdInfo + " <name> - " + descriptions.get(cmdInfo));
+            sender.sendMessage("/area " + cmdList + " - " + descriptions.get(cmdList));
+            sender.sendMessage("/area " + cmdMenu + " - " + descriptions.get(cmdMenu));
             return true;
         }
         return false;
