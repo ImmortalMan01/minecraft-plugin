@@ -16,7 +16,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
+    // Compile against the 1.20.6 API for compatibility with 1.20.x and 1.21.x servers
+    compileOnly 'io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT'
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.17'
     compileOnly 'com.sk89q.worldedit:worldedit-core:7.2.17'
     compileOnly 'me.clip:placeholderapi:2.11.5'

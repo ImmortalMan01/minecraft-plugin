@@ -2,6 +2,8 @@
 
 AreaPlayerControl, PaperMC tabanlı Minecraft sunucuları için basit bir alan yönetim eklentisidir. WorldEdit eklentisinden yararlanarak seçtiğiniz bölgeleri kaydetmenizi, silmenizi ve listelemenizi sağlar. Ayrıca kayıtlı bölgeler içindeki oyuncu sayısını görüntülemeye yarayan bir `info` komutuna sahiptir.
 
+Bu sürüm 1.20.x ve 1.21.x PaperMC sunucularıyla uyumludur.
+
 ## Komutlar
 
 ```
