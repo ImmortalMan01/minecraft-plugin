@@ -1,4 +1,5 @@
 commands:
+  base: area
   save: save
   remove: remove
   info: info
@@ -6,8 +7,24 @@ commands:
   menu: menu
 
 descriptions:
-  save: "Ge\xE7erli WorldEdit se\xE7imini verilen isimle kaydeder."
-  remove: "Belirtilen b\xF6lgeyi siler."
-  info: "B\xF6lge koordinatlar\x131n\x131 ve i\xE7indeki oyuncu say\x131s\x131n\x131 g\xF6sterir."
-  list: "Kay\x131tl\x131 t\xFCm b\xF6lgeleri listeler."
-  menu: "T\xFCm komutlar\x131n a\xE7\x131klamalar\x131n\x131 g\xF6sterir."
+  save: "Geçerli WorldEdit seçimini verilen isimle kaydeder."
+  remove: "Belirtilen bölgeyi siler."
+  info: "Bölge koordinatlarını ve içindeki oyuncu sayısını gösterir."
+  list: "Kayıtlı tüm bölgeleri listeler."
+  menu: "Tüm komutların açıklamalarını gösterir."
+
+messages:
+  onlyPlayers: "&cBu komutu sadece oyuncular kullanabilir."
+  needSelection: "&cÖnce bir WorldEdit seçimi yapmalısınız."
+  regionSaved: "&aBölge &e%name% &abaşarıyla kaydedildi."
+  usageSave: "&eKullanım: /%cmd% %save% <isim>"
+  regionRemoved: "&aBölge &e%name% &asilindi."
+  regionNotFound: "&cBölge bulunamadı."
+  regionHeader: "&6Bölge &e%name%&6:"
+  pos1: "&7Pos1: &f%pos1%"
+  pos2: "&7Pos2: &f%pos2%"
+  playersInside: "&7İçerideki oyuncu sayısı: &f%count%"
+  regionsHeader: "&6Kayıtlı Bölgeler:"
+  regionEntry: "&e- %name%"
+  menuHeader: "&6[ Bölge Komutları ]"
+  menuEntry: "&e/%cmd% %sub%%usage% &7- %desc%"

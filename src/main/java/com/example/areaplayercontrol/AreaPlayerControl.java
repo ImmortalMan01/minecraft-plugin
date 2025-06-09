@@ -10,6 +10,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.CommandMap;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.ChatColor;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.util.Collections;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -20,17 +26,21 @@ import java.util.Set;
 
 public class AreaPlayerControl extends JavaPlugin {
     private Map<String, Region> regions = new HashMap<>();
+    private String baseCommand;
     private String cmdSave;
     private String cmdRemove;
     private String cmdInfo;
     private String cmdList;
     private String cmdMenu;
     private Map<String, String> descriptions = new HashMap<>();
+    private Map<String, String> messages = new HashMap<>();
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         FileConfiguration config = getConfig();
+
+        baseCommand = config.getString("commands.base", "area").toLowerCase();
         cmdSave = config.getString("commands.save", "save").toLowerCase();
         cmdRemove = config.getString("commands.remove", "remove").toLowerCase();
         cmdInfo = config.getString("commands.info", "info").toLowerCase();
@@ -43,6 +53,16 @@ public class AreaPlayerControl extends JavaPlugin {
         descriptions.put(cmdList, config.getString("descriptions.list", "List regions"));
         descriptions.put(cmdMenu, config.getString("descriptions.menu", "Show command menu"));
 
+        if (config.isConfigurationSection("messages")) {
+            for (String key : config.getConfigurationSection("messages").getKeys(false)) {
+                String msg = config.getString("messages." + key);
+                if (msg != null) {
+                    messages.put(key, ChatColor.translateAlternateColorCodes('&', msg));
+                }
+            }
+        }
+
+        registerBaseCommand();
         loadRegions();
     }
 
@@ -79,68 +99,68 @@ public class AreaPlayerControl extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage("/area <" + String.join("|", cmdSave, cmdRemove, cmdInfo, cmdList, cmdMenu) + "> [name]");
+            sender.sendMessage(ChatColor.YELLOW + "/" + baseCommand + " <" + String.join("|", cmdSave, cmdRemove, cmdInfo, cmdList, cmdMenu) + "> [name]");
             return true;
         }
         String sub = args[0].toLowerCase();
         if (sub.equals(cmdSave)) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage("Only players can use this command");
+                sender.sendMessage(msg("onlyPlayers"));
                 return true;
             }
             if (args.length < 2) {
-                sender.sendMessage("Usage: /area " + cmdSave + " <name>");
+                sender.sendMessage(msg("usageSave").replace("%cmd%", baseCommand).replace("%save%", cmdSave));
                 return true;
             }
             Player player = (Player) sender;
             Region region = getSelection(player);
             if (region == null) {
-                sender.sendMessage("You must make a WorldEdit selection first");
+                sender.sendMessage(msg("needSelection"));
                 return true;
             }
             regions.put(args[1], region);
-            sender.sendMessage("Region " + args[1] + " saved.");
+            sender.sendMessage(msg("regionSaved", Map.of("name", args[1])));
             return true;
         } else if (sub.equals(cmdRemove)) {
             if (args.length < 2) {
-                sender.sendMessage("Usage: /area " + cmdRemove + " <name>");
+                sender.sendMessage(ChatColor.YELLOW + "Usage: /" + baseCommand + " " + cmdRemove + " <name>");
                 return true;
             }
             if (regions.remove(args[1]) != null) {
-                sender.sendMessage("Region " + args[1] + " removed.");
+                sender.sendMessage(msg("regionRemoved", Map.of("name", args[1])));
             } else {
-                sender.sendMessage("Region not found");
+                sender.sendMessage(msg("regionNotFound"));
             }
             return true;
         } else if (sub.equals(cmdInfo)) {
             if (args.length < 2) {
-                sender.sendMessage("Usage: /area " + cmdInfo + " <name>");
+                sender.sendMessage(ChatColor.YELLOW + "Usage: /" + baseCommand + " " + cmdInfo + " <name>");
                 return true;
             }
             Region region = regions.get(args[1]);
             if (region != null) {
-                sender.sendMessage("Region " + args[1] + ":");
-                sender.sendMessage("Pos1: " + formatLocation(region.pos1));
-                sender.sendMessage("Pos2: " + formatLocation(region.pos2));
+                sender.sendMessage(msg("regionHeader", Map.of("name", args[1])));
+                sender.sendMessage(msg("pos1", Map.of("pos1", formatLocation(region.pos1))));
+                sender.sendMessage(msg("pos2", Map.of("pos2", formatLocation(region.pos2))));
                 int players = countPlayers(region);
-                sender.sendMessage("Players inside: " + players);
+                sender.sendMessage(msg("playersInside", Map.of("count", String.valueOf(players))));
             } else {
-                sender.sendMessage("Region not found");
+                sender.sendMessage(msg("regionNotFound"));
             }
             return true;
         } else if (sub.equals(cmdList)) {
-            sender.sendMessage("Regions:");
+            sender.sendMessage(msg("regionsHeader"));
             for (String key : regions.keySet()) {
-                sender.sendMessage("- " + key);
+                sender.sendMessage(msg("regionEntry", Map.of("name", key)));
             }
             return true;
         } else if (sub.equals(cmdMenu)) {
-            sender.sendMessage("Area commands:");
-            sender.sendMessage("/area " + cmdSave + " <name> - " + descriptions.get(cmdSave));
-            sender.sendMessage("/area " + cmdRemove + " <name> - " + descriptions.get(cmdRemove));
-            sender.sendMessage("/area " + cmdInfo + " <name> - " + descriptions.get(cmdInfo));
-            sender.sendMessage("/area " + cmdList + " - " + descriptions.get(cmdList));
-            sender.sendMessage("/area " + cmdMenu + " - " + descriptions.get(cmdMenu));
+            sender.sendMessage(msg("menuHeader"));
+            sendMenuEntry(sender, cmdSave, " <name>", descriptions.get(cmdSave));
+            sendMenuEntry(sender, cmdRemove, " <name>", descriptions.get(cmdRemove));
+            sendMenuEntry(sender, cmdInfo, " <name>", descriptions.get(cmdInfo));
+            sendMenuEntry(sender, cmdList, "", descriptions.get(cmdList));
+            sendMenuEntry(sender, cmdMenu, "", descriptions.get(cmdMenu));
             return true;
         }
         return false;
@@ -178,6 +198,51 @@ public class AreaPlayerControl extends JavaPlugin {
             }
         }
         return count;
+    }
+
+    private void registerBaseCommand() {
+        if (baseCommand.equalsIgnoreCase("area")) return;
+        try {
+            Constructor<PluginCommand> cons = PluginCommand.class.getDeclaredConstructor(String.class, JavaPlugin.class);
+            cons.setAccessible(true);
+            PluginCommand alias = cons.newInstance(baseCommand, this);
+            alias.setExecutor(this);
+            alias.setAliases(Collections.emptyList());
+            alias.setDescription("Manage areas");
+            alias.setUsage("/" + baseCommand + " <" + String.join("|", cmdSave, cmdRemove, cmdInfo, cmdList, cmdMenu) + "> [name]");
+            getCommandMap().register(getDescription().getName(), alias);
+        } catch (Exception e) {
+            getLogger().warning("Failed to register base command alias: " + e.getMessage());
+        }
+    }
+
+    private CommandMap getCommandMap() throws Exception {
+        Field f = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+        f.setAccessible(true);
+        return (CommandMap) f.get(Bukkit.getServer());
+    }
+
+    private String msg(String key) {
+        return messages.getOrDefault(key, key);
+    }
+
+    private String msg(String key, Map<String, String> params) {
+        String m = msg(key);
+        if (params != null) {
+            for (Map.Entry<String, String> e : params.entrySet()) {
+                m = m.replace("%" + e.getKey() + "%", e.getValue());
+            }
+        }
+        return m;
+    }
+
+    private void sendMenuEntry(CommandSender sender, String sub, String usage, String desc) {
+        sender.sendMessage(msg("menuEntry", Map.of(
+                "cmd", baseCommand,
+                "sub", sub,
+                "usage", usage,
+                "desc", desc
+        )));
     }
 
     private static class Region {
