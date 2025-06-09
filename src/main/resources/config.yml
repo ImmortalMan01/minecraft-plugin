@@ -1,5 +1,4 @@
 commands:
-  base: area
   save: save
   remove: remove
   info: info

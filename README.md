@@ -14,11 +14,9 @@ AreaPlayerControl, PaperMC tabanlı Minecraft sunucuları için basit bir alan y
 
 ## Yapılandırma
 
-`config.yml` dosyasıyla ana komut adını ve alt komutları değiştirebilir,
-mesajların Türkçe çevirilerini de özelleştirebilirsiniz. `commands.base`
-anahtarını düzenleyerek eklentinin kullandığı temel komut adını
-belirleyebilirsiniz. Varsayılan değer `area` olup `/area` komutu olarak
-kullanılır.
+`config.yml` dosyasıyla alt komut adlarını değiştirebilir,
+mesajların Türkçe çevirilerini de özelleştirebilirsiniz. Ana komut ismi
+`/area` olarak sabittir ve yapılandırma ile değiştirilemez.
 
 ## Derleme (Jar Oluşturma)
 
