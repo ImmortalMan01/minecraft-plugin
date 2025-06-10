@@ -4,6 +4,8 @@ AreaPlayerControl, PaperMC tabanlı Minecraft sunucuları için basit bir alan y
 
 Bu sürüm 1.20.x ve 1.21.x PaperMC sunucularıyla uyumludur.
 
+Komutların çalışabilmesi için oyuncunun OP yetkisine sahip olması gerekir.
+
 ## Komutlar
 
 ```

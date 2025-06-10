@@ -8,3 +8,10 @@ commands:
     description: Manage areas
     usage: /<command> <save|remove|info|list|menu|reload> [name]
     aliases: [area]
+    permission: areaplayercontrol.admin
+    permission-message: "&cBu komutu kullanmak için yetkiniz yok."
+
+permissions:
+  areaplayercontrol.admin:
+    description: Allows use of AreaPlayerControl commands
+    default: op

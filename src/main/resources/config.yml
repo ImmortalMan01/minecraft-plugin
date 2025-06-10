@@ -16,6 +16,7 @@ descriptions:
 
 messages:
   onlyPlayers: "&cBu komutu sadece oyuncular kullanabilir."
+  noPermission: "&cBu komutu kullanmak için OP olmalısınız."
   needSelection: "&cÖnce bir WorldEdit seçimi yapmalısınız."
   regionSaved: "&aBölge &e%name% &abaşarıyla kaydedildi."
   usageSave: "&eKullanım: /%cmd% %save% <isim>"
