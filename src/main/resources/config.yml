@@ -31,3 +31,11 @@ messages:
   menuHeader: "&6[ Bölge Komutları ]"
   menuEntry: "&e/%cmd% %sub%%usage% &7- %desc%"
   reloaded: "&aYapılandırma yeniden yüklendi."
+
+menu:
+  title: "&8[ &aBölge Menüsü &8]"
+  buttons:
+    save: "&aKaydet"
+    remove: "&cSil"
+    info: "&bBilgi"
+

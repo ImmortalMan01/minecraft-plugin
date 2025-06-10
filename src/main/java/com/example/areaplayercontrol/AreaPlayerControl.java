@@ -13,9 +13,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.ChatColor;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.HandlerList;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Collections;
+import java.util.HashSet;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -38,6 +44,9 @@ public class AreaPlayerControl extends JavaPlugin {
     private Map<String, String> descriptions = new HashMap<>();
     private Map<String, String> messages = new HashMap<>();
     private PlaceholderExpansion expansion;
+    private String menuTitle;
+    private Map<String, String> menuButtons = new HashMap<>();
+    private Set<Player> openMenus = new HashSet<>();
 
     @Override
     public void onEnable() {
@@ -66,6 +75,15 @@ public class AreaPlayerControl extends JavaPlugin {
                 }
             }
         }
+
+        menuTitle = config.getString("menu.title", "Area Menu");
+        if (config.isConfigurationSection("menu.buttons")) {
+            for (String key : config.getConfigurationSection("menu.buttons").getKeys(false)) {
+                menuButtons.put(key, config.getString("menu.buttons." + key, key));
+            }
+        }
+
+        Bukkit.getPluginManager().registerEvents(new MenuListener(), this);
 
         registerBaseCommand();
         loadRegions();
@@ -190,13 +208,18 @@ public class AreaPlayerControl extends JavaPlugin {
             }
             return true;
         } else if (sub.equals(cmdMenu)) {
-            sender.sendMessage(msg("menuHeader"));
-            sendMenuEntry(sender, cmdSave, " <name>", descriptions.get(cmdSave));
-            sendMenuEntry(sender, cmdRemove, " <name>", descriptions.get(cmdRemove));
-            sendMenuEntry(sender, cmdInfo, " <name>", descriptions.get(cmdInfo));
-            sendMenuEntry(sender, cmdList, "", descriptions.get(cmdList));
-            sendMenuEntry(sender, cmdMenu, "", descriptions.get(cmdMenu));
-            sendMenuEntry(sender, cmdReload, "", descriptions.get(cmdReload));
+            if (sender instanceof Player) {
+                AreaMenu menu = new AreaMenu(this);
+                menu.open((Player) sender);
+            } else {
+                sender.sendMessage(msg("menuHeader"));
+                sendMenuEntry(sender, cmdSave, " <name>", descriptions.get(cmdSave));
+                sendMenuEntry(sender, cmdRemove, " <name>", descriptions.get(cmdRemove));
+                sendMenuEntry(sender, cmdInfo, " <name>", descriptions.get(cmdInfo));
+                sendMenuEntry(sender, cmdList, "", descriptions.get(cmdList));
+                sendMenuEntry(sender, cmdMenu, "", descriptions.get(cmdMenu));
+                sendMenuEntry(sender, cmdReload, "", descriptions.get(cmdReload));
+            }
             return true;
         } else if (sub.equals(cmdReload)) {
             reloadPlugin();
@@ -265,6 +288,38 @@ public class AreaPlayerControl extends JavaPlugin {
         return countPlayers(r);
     }
 
+    public String getBaseCommand() {
+        return baseCommand;
+    }
+
+    public String getCmdSave() {
+        return cmdSave;
+    }
+
+    public String getCmdRemove() {
+        return cmdRemove;
+    }
+
+    public String getCmdInfo() {
+        return cmdInfo;
+    }
+
+    public String getMenuTitle() {
+        return menuTitle;
+    }
+
+    public String getMenuButton(String key) {
+        return menuButtons.getOrDefault(key, key);
+    }
+
+    public void registerOpenMenu(Player player, AreaMenu menu) {
+        openMenus.add(player);
+    }
+
+    public void unregisterOpenMenu(Player player) {
+        openMenus.remove(player);
+    }
+
     private void registerBaseCommand() {
         PluginCommand cmd = getCommand("areaplayercontrol");
         if (cmd == null) {
@@ -301,6 +356,11 @@ public class AreaPlayerControl extends JavaPlugin {
     }
 
     private void reloadPlugin() {
+        for (Player p : openMenus) {
+            p.closeInventory();
+        }
+        openMenus.clear();
+        HandlerList.unregisterAll(this);
         reloadConfig();
         saveRegions();
         regions.clear();
@@ -332,6 +392,16 @@ public class AreaPlayerControl extends JavaPlugin {
             }
         }
 
+        menuTitle = config.getString("menu.title", "Area Menu");
+        menuButtons.clear();
+        if (config.isConfigurationSection("menu.buttons")) {
+            for (String key : config.getConfigurationSection("menu.buttons").getKeys(false)) {
+                menuButtons.put(key, config.getString("menu.buttons." + key, key));
+            }
+        }
+
+        Bukkit.getPluginManager().registerEvents(new MenuListener(), this);
+
         registerBaseCommand();
         loadRegions();
     }
@@ -343,6 +413,25 @@ public class AreaPlayerControl extends JavaPlugin {
                 "usage", usage,
                 "desc", desc
         )));
+    }
+
+    private class MenuListener implements Listener {
+        @EventHandler
+        public void onInventoryClick(InventoryClickEvent e) {
+            if (!(e.getWhoClicked() instanceof Player)) return;
+            Player player = (Player) e.getWhoClicked();
+            if (!openMenus.contains(player)) return;
+            if (e.getInventory().getHolder() instanceof AreaMenu menu) {
+                menu.handleClick(player, e);
+            }
+        }
+
+        @EventHandler
+        public void onInventoryClose(InventoryCloseEvent e) {
+            if (openMenus.contains(e.getPlayer())) {
+                openMenus.remove(e.getPlayer());
+            }
+        }
     }
 
     private static class Region {
