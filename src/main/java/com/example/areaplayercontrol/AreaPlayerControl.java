@@ -113,6 +113,14 @@ public class AreaPlayerControl extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(msg("onlyPlayers"));
+            return true;
+        }
+        if (!sender.isOp()) {
+            sender.sendMessage(msg("noPermission"));
+            return true;
+        }
         if (args.length == 0) {
             // Show the command menu when no sub command is provided
             sender.sendMessage(msg("menuHeader"));
@@ -126,10 +134,6 @@ public class AreaPlayerControl extends JavaPlugin {
         }
         String sub = args[0].toLowerCase();
         if (sub.equals(cmdSave)) {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage(msg("onlyPlayers"));
-                return true;
-            }
             if (args.length < 2) {
                 sender.sendMessage(msg("usageSave").replace("%cmd%", baseCommand).replace("%save%", cmdSave));
                 return true;
