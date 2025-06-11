@@ -9,7 +9,7 @@ commands:
     usage: /<command> <save|remove|info|list|menu|reload> [name]
     aliases: [area]
     permission: areaplayercontrol.admin
-    permission-message: "&cBu komutu kullanmak için yetkiniz yok."
+    permission-message: "&cYou do not have permission to use this command."
 
 permissions:
   areaplayercontrol.admin:

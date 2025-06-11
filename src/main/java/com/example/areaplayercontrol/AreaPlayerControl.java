@@ -35,6 +35,7 @@ public class AreaPlayerControl extends JavaPlugin {
     private String cmdList;
     private String cmdMenu;
     private String cmdReload;
+    private String language = "en";
     private Map<String, String> descriptions = new HashMap<>();
     private Map<String, String> messages = new HashMap<>();
     private PlaceholderExpansion expansion;
@@ -44,6 +45,8 @@ public class AreaPlayerControl extends JavaPlugin {
         saveDefaultConfig();
         FileConfiguration config = getConfig();
 
+        language = config.getString("language", "en").toLowerCase();
+
         cmdSave = config.getString("commands.save", "save").toLowerCase();
         cmdRemove = config.getString("commands.remove", "remove").toLowerCase();
         cmdInfo = config.getString("commands.info", "info").toLowerCase();
@@ -51,21 +54,8 @@ public class AreaPlayerControl extends JavaPlugin {
         cmdMenu = config.getString("commands.menu", "menu").toLowerCase();
         cmdReload = config.getString("commands.reload", "reload").toLowerCase();
 
-        descriptions.put(cmdSave, config.getString("descriptions.save", "Save a region"));
-        descriptions.put(cmdRemove, config.getString("descriptions.remove", "Remove a region"));
-        descriptions.put(cmdInfo, config.getString("descriptions.info", "Show region info"));
-        descriptions.put(cmdList, config.getString("descriptions.list", "List regions"));
-        descriptions.put(cmdMenu, config.getString("descriptions.menu", "Show command menu"));
-        descriptions.put(cmdReload, config.getString("descriptions.reload", "Reload config"));
-
-        if (config.isConfigurationSection("messages")) {
-            for (String key : config.getConfigurationSection("messages").getKeys(false)) {
-                String msg = config.getString("messages." + key);
-                if (msg != null) {
-                    messages.put(key, ChatColor.translateAlternateColorCodes('&', msg));
-                }
-            }
-        }
+        loadLocalizedSection(config, "descriptions", descriptions, false);
+        loadLocalizedSection(config, "messages", messages, true);
 
         registerBaseCommand();
         loadRegions();
@@ -313,6 +303,8 @@ public class AreaPlayerControl extends JavaPlugin {
 
         FileConfiguration config = getConfig();
 
+        language = config.getString("language", "en").toLowerCase();
+
         cmdSave = config.getString("commands.save", "save").toLowerCase();
         cmdRemove = config.getString("commands.remove", "remove").toLowerCase();
         cmdInfo = config.getString("commands.info", "info").toLowerCase();
@@ -320,24 +312,42 @@ public class AreaPlayerControl extends JavaPlugin {
         cmdMenu = config.getString("commands.menu", "menu").toLowerCase();
         cmdReload = config.getString("commands.reload", "reload").toLowerCase();
 
-        descriptions.put(cmdSave, config.getString("descriptions.save", "Save a region"));
-        descriptions.put(cmdRemove, config.getString("descriptions.remove", "Remove a region"));
-        descriptions.put(cmdInfo, config.getString("descriptions.info", "Show region info"));
-        descriptions.put(cmdList, config.getString("descriptions.list", "List regions"));
-        descriptions.put(cmdMenu, config.getString("descriptions.menu", "Show command menu"));
-        descriptions.put(cmdReload, config.getString("descriptions.reload", "Reload config"));
-
-        if (config.isConfigurationSection("messages")) {
-            for (String key : config.getConfigurationSection("messages").getKeys(false)) {
-                String msg = config.getString("messages." + key);
-                if (msg != null) {
-                    messages.put(key, ChatColor.translateAlternateColorCodes('&', msg));
-                }
-            }
-        }
+        loadLocalizedSection(config, "descriptions", descriptions, false);
+        loadLocalizedSection(config, "messages", messages, true);
 
         registerBaseCommand();
         loadRegions();
+    }
+
+    private void loadLocalizedSection(FileConfiguration config, String base, Map<String, String> target, boolean colorize) {
+        String langPath = base + "." + language;
+        if (config.isConfigurationSection(langPath)) {
+            for (String key : config.getConfigurationSection(langPath).getKeys(false)) {
+                String val = config.getString(langPath + "." + key);
+                if (val != null) {
+                    if (colorize) {
+                        val = ChatColor.translateAlternateColorCodes('&', val);
+                    }
+                    target.put(key, val);
+                }
+            }
+        }
+        if (!language.equals("en")) {
+            String enPath = base + ".en";
+            if (config.isConfigurationSection(enPath)) {
+                for (String key : config.getConfigurationSection(enPath).getKeys(false)) {
+                    if (!target.containsKey(key)) {
+                        String val = config.getString(enPath + "." + key);
+                        if (val != null) {
+                            if (colorize) {
+                                val = ChatColor.translateAlternateColorCodes('&', val);
+                            }
+                            target.put(key, val);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void sendMenuEntry(CommandSender sender, String sub, String usage, String desc) {
