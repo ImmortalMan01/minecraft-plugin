@@ -23,11 +23,16 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import com.example.areaplayercontrol.RegionPlaceholderExpansion;
 
 public class AreaPlayerControl extends JavaPlugin {
     private Map<String, Region> regions = new HashMap<>();
+    /* Tracks how many players are currently inside each region */
+    final Map<String, Integer> regionCounts = new HashMap<>();
+    /* Tracks which region a player is currently inside */
+    final Map<UUID, String> playerRegion = new HashMap<>();
     private final String baseCommand = "area";
     private String cmdSave;
     private String cmdRemove;
@@ -60,6 +65,9 @@ public class AreaPlayerControl extends JavaPlugin {
         registerBaseCommand();
         loadRegions();
 
+        initializeTracking();
+        Bukkit.getPluginManager().registerEvents(new RegionPlayerListener(this), this);
+
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             expansion = new RegionPlaceholderExpansion(this);
             expansion.register();
@@ -74,6 +82,8 @@ public class AreaPlayerControl extends JavaPlugin {
         if (expansion != null) {
             expansion.unregister();
         }
+        regionCounts.clear();
+        playerRegion.clear();
     }
 
     private void loadRegions() {
@@ -99,6 +109,37 @@ public class AreaPlayerControl extends JavaPlugin {
             config.set(path + "pos2", entry.getValue().pos2);
         }
         saveConfig();
+    }
+
+    /**
+     * Initialise regionCounts and playerRegion based on current regions and
+     * online players.
+     */
+    private void initializeTracking() {
+        regionCounts.clear();
+        playerRegion.clear();
+        for (String name : regions.keySet()) {
+            regionCounts.put(name, 0);
+        }
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            String region = getRegionName(p.getLocation());
+            if (region != null) {
+                playerRegion.put(p.getUniqueId(), region);
+                regionCounts.put(region, regionCounts.get(region) + 1);
+            }
+        }
+    }
+
+    /**
+     * Find the name of the region containing the given location, or null if none.
+     */
+    String getRegionName(Location loc) {
+        for (Map.Entry<String, Region> e : regions.entrySet()) {
+            if (e.getValue().contains(loc)) {
+                return e.getKey();
+            }
+        }
+        return null;
     }
 
     @Override
@@ -135,6 +176,7 @@ public class AreaPlayerControl extends JavaPlugin {
                 return true;
             }
             regions.put(args[1], region);
+            regionCounts.put(args[1], 0);
             sender.sendMessage(msg("regionSaved", Map.of("name", args[1])));
             return true;
         } else if (sub.equals(cmdRemove)) {
@@ -143,6 +185,8 @@ public class AreaPlayerControl extends JavaPlugin {
                 return true;
             }
             if (regions.remove(args[1]) != null) {
+                regionCounts.remove(args[1]);
+                playerRegion.entrySet().removeIf(e -> e.getValue().equals(args[1]));
                 sender.sendMessage(msg("regionRemoved", Map.of("name", args[1])));
             } else {
                 sender.sendMessage(msg("regionNotFound"));
@@ -252,11 +296,7 @@ public class AreaPlayerControl extends JavaPlugin {
 
 
     public int getPlayersInRegion(String name) {
-        Region r = regions.get(name);
-        if (r == null) {
-            return 0;
-        }
-        return countPlayers(r);
+        return regionCounts.getOrDefault(name, 0);
     }
 
     private void registerBaseCommand() {
@@ -300,6 +340,8 @@ public class AreaPlayerControl extends JavaPlugin {
         regions.clear();
         messages.clear();
         descriptions.clear();
+        regionCounts.clear();
+        playerRegion.clear();
 
         FileConfiguration config = getConfig();
 
@@ -317,6 +359,7 @@ public class AreaPlayerControl extends JavaPlugin {
 
         registerBaseCommand();
         loadRegions();
+        initializeTracking();
     }
 
     private void loadLocalizedSection(FileConfiguration config, String base, Map<String, String> target, boolean colorize) {
